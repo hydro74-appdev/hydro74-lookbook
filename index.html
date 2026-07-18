@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0b0a08">
+<meta name="description" content="The Hydro74 Lookbook — a folio of selected works.">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>HYDRO74 — Lookbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   HYDRO74 LOOKBOOK — "The Folio"
+   Ink black · aged gold · bone ivory · oxblood
+   ============================================================ */
+:root{
+  --ink:#0b0a08;          /* ground */
+  --ink-2:#141210;        /* raised panels */
+  --gold:#c9a227;         /* bright gilt */
+  --gold-dim:#8a7226;     /* aged gilt / rules */
+  --bone:#e8e0ce;         /* primary text */
+  --bone-dim:#9a927f;     /* secondary text */
+  --oxblood:#6e1f1f;      /* rare accent: pitch mode, errors */
+  --frame-inset:14px;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--ink);color:var(--bone);overflow:hidden}
+body{font-family:'Cormorant Garamond',Georgia,serif;font-size:17px}
+
+.caps{font-family:'Cinzel',serif;letter-spacing:.22em;text-transform:uppercase}
+
+/* ---------- top bar ---------- */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:40;
+  padding:calc(10px + var(--safe-top)) 18px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(to bottom,rgba(11,10,8,.92),rgba(11,10,8,0));
+  pointer-events:none;
+}
+header>*{pointer-events:auto}
+.wordmark{display:flex;align-items:center;gap:10px;text-decoration:none}
+.wordmark .mark{height:40px;width:auto;display:block}
+.wm-text{font-size:11px;color:var(--bone-dim);font-weight:400}
+.wm-text b{color:var(--gold);font-weight:600}
+.index-btn{
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--bone-dim);background:none;border:1px solid var(--gold-dim);
+  padding:7px 13px 6px;cursor:pointer;transition:color .25s,border-color .25s;
+}
+.index-btn:hover,.index-btn:focus-visible{color:var(--gold);border-color:var(--gold);outline:none}
+
+/* ---------- plate scroller ---------- */
+main{
+  height:100%;overflow-y:auto;scroll-snap-type:y mandatory;
+  scrollbar-width:none;
+}
+main::-webkit-scrollbar{display:none}
+.plate{
+  height:100%;scroll-snap-align:start;scroll-snap-stop:always;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:calc(52px + var(--safe-top)) 20px calc(46px + var(--safe-bottom));
+  position:relative;
+}
+/* the engraved frame — signature element */
+.frame{
+  position:relative;max-width:min(88vw,560px);width:100%;
+  flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--gold-dim);
+  padding:var(--frame-inset);
+  cursor:pointer;
+}
+.frame::before{
+  content:"";position:absolute;inset:5px;border:1px solid rgba(201,162,39,.35);
+  pointer-events:none;
+}
+.frame .corner{
+  position:absolute;width:22px;height:22px;pointer-events:none;color:var(--gold);
+}
+.frame .c-tl{top:-6px;left:-6px}
+.frame .c-tr{top:-6px;right:-6px;transform:rotate(90deg)}
+.frame .c-br{bottom:-6px;right:-6px;transform:rotate(180deg)}
+.frame .c-bl{bottom:-6px;left:-6px;transform:rotate(270deg)}
+.frame img{
+  max-width:100%;max-height:100%;object-fit:contain;display:block;
+  opacity:0;transition:opacity .6s ease;
+}
+.frame img.loaded{opacity:1}
+.plate-caption{margin-top:16px;text-align:center;flex-shrink:0}
+.plate-no{
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:.3em;color:var(--gold-dim);
+  margin-bottom:5px;
+}
+.plate-title{
+  font-family:'Cinzel',serif;font-weight:600;font-size:15px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--bone);
+}
+.plate-sub{font-size:15px;font-style:italic;color:var(--bone-dim);margin-top:3px}
+
+/* subtle scroll hint on first plate */
+.scroll-hint{
+  position:absolute;bottom:calc(14px + var(--safe-bottom));left:50%;transform:translateX(-50%);
+  color:var(--gold-dim);font-size:18px;animation:drift 2.4s ease-in-out infinite;
+}
+@keyframes drift{0%,100%{transform:translate(-50%,0);opacity:.5}50%{transform:translate(-50%,6px);opacity:1}}
+@media (prefers-reduced-motion:reduce){.scroll-hint{animation:none}}
+
+/* ---------- detail overlay ---------- */
+.overlay{
+  position:fixed;inset:0;z-index:60;background:rgba(11,10,8,.97);
+  display:none;flex-direction:column;
+  padding:calc(12px + var(--safe-top)) 0 var(--safe-bottom);
+}
+.overlay.open{display:flex}
+.overlay-top{display:flex;justify-content:flex-end;padding:0 16px}
+.close-btn{
+  background:none;border:1px solid var(--gold-dim);color:var(--bone-dim);
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:.24em;padding:7px 13px 6px;
+  cursor:pointer;
+}
+.close-btn:hover{color:var(--gold);border-color:var(--gold)}
+.zoom-stage{
+  flex:1;overflow:hidden;position:relative;touch-action:none;
+  display:flex;align-items:center;justify-content:center;
+}
+.zoom-stage img{
+  max-width:100%;max-height:100%;transform-origin:0 0;will-change:transform;
+  user-select:none;-webkit-user-drag:none;
+}
+.zoom-note{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:10px;
+  font-family:'Cinzel',serif;letter-spacing:.24em;color:var(--gold-dim);text-transform:uppercase;
+  pointer-events:none;transition:opacity .5s}
+.detail-sheet{
+  border-top:1px solid var(--gold-dim);padding:14px 22px 18px;text-align:center;
+  max-height:38vh;overflow-y:auto;
+}
+.detail-sheet .plate-no{margin-bottom:6px}
+.detail-sheet h2{font-family:'Cinzel',serif;font-weight:600;font-size:17px;letter-spacing:.14em;text-transform:uppercase}
+.detail-meta{margin-top:6px;color:var(--bone-dim);font-size:15px}
+.detail-meta em{color:var(--bone)}
+.detail-notes{margin-top:10px;font-size:16px;line-height:1.55;color:var(--bone);
+  max-width:46ch;margin-left:auto;margin-right:auto}
+.detail-contact{margin-top:12px}
+.detail-contact a{color:var(--gold);text-decoration:none;font-family:'Cinzel',serif;
+  font-size:11px;letter-spacing:.24em;text-transform:uppercase;border-bottom:1px solid var(--gold-dim);padding-bottom:2px}
+
+/* ---------- index (filter) panel ---------- */
+.index-panel{
+  position:fixed;inset:0;z-index:70;background:rgba(11,10,8,.97);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:calc(20px + var(--safe-top)) 24px calc(20px + var(--safe-bottom));
+  text-align:center;
+}
+.index-panel.open{display:flex}
+.index-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.34em;color:var(--gold-dim);
+  text-transform:uppercase;margin-bottom:22px}
+.rule{width:64px;height:1px;background:var(--gold-dim);margin:0 auto 26px;position:relative}
+.rule::after{content:"◆";position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+  color:var(--gold);font-size:9px;background:var(--ink);padding:0 8px}
+.cat-list{list-style:none;display:flex;flex-direction:column;gap:16px}
+.cat-list button{
+  background:none;border:none;color:var(--bone-dim);cursor:pointer;
+  font-family:'Cinzel',serif;font-size:16px;letter-spacing:.2em;text-transform:uppercase;
+  transition:color .25s;padding:4px 8px;
+}
+.cat-list button:hover,.cat-list button:focus-visible{color:var(--gold);outline:none}
+.cat-list button.active{color:var(--gold)}
+.cat-list button.active::before,.cat-list button.active::after{content:" · ";color:var(--gold-dim)}
+.index-foot{margin-top:34px;font-style:italic;color:var(--bone-dim);font-size:15px}
+.pitch-link{margin-top:18px;background:none;border:none;color:var(--gold-dim);cursor:pointer;
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:.3em;text-transform:uppercase}
+
+/* ---------- pitch mode ---------- */
+body.pitch .wm-text b{color:var(--oxblood)}
+.pitch-banner{
+  display:none;position:fixed;top:calc(44px + var(--safe-top));left:50%;transform:translateX(-50%);
+  z-index:39;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--bone);background:var(--oxblood);padding:5px 14px 4px;
+}
+body.pitch .pitch-banner{display:block}
+.pin-panel{
+  position:fixed;inset:0;z-index:80;background:rgba(11,10,8,.97);
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+}
+.pin-panel.open{display:flex}
+.pin-panel input{
+  background:var(--ink-2);border:1px solid var(--gold-dim);color:var(--bone);
+  font-family:'Cinzel',serif;font-size:22px;letter-spacing:.5em;text-align:center;
+  width:200px;padding:12px 0 10px;outline:none;
+}
+.pin-panel input:focus{border-color:var(--gold)}
+.pin-actions{display:flex;gap:14px}
+
+/* ---------- loading / empty ---------- */
+.status-veil{
+  position:fixed;inset:0;z-index:90;background:var(--ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  transition:opacity .5s;
+}
+.status-veil.hidden{opacity:0;pointer-events:none}
+.seal{width:74px;height:74px;color:var(--gold);animation:sealPulse 2.2s ease-in-out infinite}
+@keyframes sealPulse{0%,100%{opacity:.55}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.seal{animation:none}}
+.status-text{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.32em;color:var(--bone-dim);text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="wordmark" href="./"><img src="https://res.cloudinary.com/hydro74/image/upload/v1784347063/logo-mark_1_shvynx.png" alt="Hydro74" class="mark"><span class="caps wm-text">Hydro<b>74</b></span></a>
+  <button class="index-btn" id="indexBtn" aria-label="Open index">Index</button>
+</header>
+<div class="pitch-banner" id="pitchBanner">Private Selection</div>
+
+<main id="folio" aria-label="Lookbook plates"></main>
+
+<!-- detail overlay -->
+<div class="overlay" id="overlay" role="dialog" aria-modal="true">
+  <div class="overlay-top"><button class="close-btn" id="closeOverlay">Close</button></div>
+  <div class="zoom-stage" id="zoomStage">
+    <img id="zoomImg" alt="">
+    <div class="zoom-note" id="zoomNote">Pinch to examine the linework</div>
+  </div>
+  <div class="detail-sheet" id="detailSheet"></div>
+</div>
+
+<!-- index / filter panel -->
+<div class="index-panel" id="indexPanel" role="dialog" aria-modal="true">
+  <div class="index-title">Index of Plates</div>
+  <div class="rule"></div>
+  <ul class="cat-list" id="catList"></ul>
+  <div class="index-foot" id="plateCount"></div>
+  <button class="pitch-link" id="pitchLink">Private access</button>
+  <br><button class="close-btn" id="closeIndex" style="margin-top:10px">Close</button>
+</div>
+
+<!-- pitch PIN -->
+<div class="pin-panel" id="pinPanel" role="dialog" aria-modal="true">
+  <div class="index-title">Private Selection</div>
+  <input id="pinInput" type="password" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="Access code">
+  <div class="pin-actions">
+    <button class="close-btn" id="pinGo">Enter</button>
+    <button class="close-btn" id="pinCancel">Cancel</button>
+  </div>
+</div>
+
+<!-- loading veil -->
+<div class="status-veil" id="veil">
+  <img class="seal" src="https://res.cloudinary.com/hydro74/image/upload/v1784346865/logo-gold_na9pjv.png" alt="" style="width:120px;height:auto">
+  <div class="status-text" id="veilText">Opening the folio</div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG — the only section you edit per deployment
+   ============================================================ */
+const CONFIG = {
+  // Google Sheet must be shared "Anyone with the link → Viewer".
+  // Leave SHEET_ID empty to run in demo mode with placeholder plates.
+  SHEET_ID: "1qf5I-aQLGhZCwXikFRLPg1iLWUSZ_Y870l3eHKW6w_0",
+  SHEET_TAB: "Plates",          // tab name inside the spreadsheet
+  CONTACT_EMAIL: "licensing@hydro74.com",
+  PITCH_PIN: "7474",            // change before shipping
+  BRAND: "HYDRO74"
+};
+
+/* Sheet columns (row 1 headers, in this order):
+   title | image | thumb | category | client | year | medium | notes | collection | order
+   - image: full-res URL (Cloudinary recommended)
+   - thumb: optional smaller URL; falls back to image
+   - collection: blank = public; a tag like "nike-2026" = pitch-mode only
+   - order: number for sequence                                            */
+
+/* ============================================================
+   DATA LAYER — single entry point, swappable later
+   ============================================================ */
+async function loadPortfolio(){
+  if(!CONFIG.SHEET_ID) return demoPlates();
+  const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(CONFIG.SHEET_TAB)}&t=${Date.now()}`;
+  try{
+    const res = await fetch(url,{cache:"no-store"});
+    const text = await res.text();
+    const json = JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}")+1));
+    const cols = json.table.cols.map(c=>(c.label||"").toLowerCase().trim());
+    const rows = json.table.rows.map(r=>{
+      const o={};
+      cols.forEach((c,i)=>{ o[c] = r.c[i] ? (r.c[i].f ?? r.c[i].v ?? "") : ""; });
+      return o;
+    }).filter(o=>o.title && o.image);
+    rows.sort((a,b)=>(Number(a.order)||9999)-(Number(b.order)||9999));
+    return rows;
+  }catch(err){
+    console.error("Sheet load failed, using demo plates:",err);
+    return demoPlates();
+  }
+}
+
+/* ---------- demo plates: self-drawn ornamental SVG placeholders ---------- */
+function ornamentSVG(numeral,motif){
+  const motifs={
+    laurel:`<path d="M150 240 C110 200 110 140 150 100 M150 240 C190 200 190 140 150 100" fill="none"/>
+            <path d="M128 200 l-16 -6 M132 176 l-17 -10 M138 152 l-16 -13 M172 200 l16 -6 M168 176 l17 -10 M162 152 l16 -13" fill="none"/>`,
+    crest:`<path d="M150 90 L200 110 L200 170 C200 210 150 240 150 240 C150 240 100 210 100 170 L100 110 Z" fill="none"/>
+           <path d="M150 90 L150 240 M100 150 L200 150" fill="none"/>`,
+    dagger:`<path d="M150 92 L150 232 M132 120 L168 120 M150 92 L142 108 L158 108 Z M144 232 L156 232 L150 246 Z" fill="none"/>
+            <circle cx="150" cy="150" r="10" fill="none"/>`,
+    quill:`<path d="M110 240 C150 180 190 130 210 96 C180 108 140 150 116 210 Z" fill="none"/>
+           <path d="M110 240 L96 254" fill="none"/>`,
+    key:`<circle cx="150" cy="120" r="26" fill="none"/><path d="M150 146 L150 236 M150 214 L172 214 M150 232 L166 232" fill="none"/>`,
+    serpent:`<path d="M110 220 C110 180 190 180 190 140 C190 108 120 108 120 138 C120 160 176 160 176 200" fill="none"/>
+             <circle cx="176" cy="206" r="4" fill="none"/>`
+  };
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 340">
+    <rect width="300" height="340" fill="#100e0b"/>
+    <rect x="12" y="12" width="276" height="316" fill="none" stroke="#8a7226" stroke-width="1"/>
+    <rect x="20" y="20" width="260" height="300" fill="none" stroke="#c9a227" stroke-width=".6" opacity=".5"/>
+    <g stroke="#c9a227" stroke-width="2.4" stroke-linecap="round">${motifs[motif]}</g>
+    <text x="150" y="296" text-anchor="middle" fill="#c9a227" font-family="Georgia,serif" font-size="20" letter-spacing="6">${numeral}</text>
+  </svg>`;
+  return "data:image/svg+xml," + encodeURIComponent(svg);
+}
+function demoPlates(){
+  const d=[
+    ["The Vigil","Heraldry","Sample Client","2026","Pen & ink, gilded","Placeholder plate. Replace with artwork via the Google Sheet.","","1","laurel"],
+    ["Blackwatch Crest","Heraldry","","2025","Digital engraving","","","2","crest"],
+    ["Oathkeeper","Blades","Sample Client","2025","Ink on vellum","","","3","dagger"],
+    ["The Scrivener","Typography","","2024","Hand lettering","","","4","quill"],
+    ["Warden's Key","Emblems","","2024","Digital engraving","","","5","key"],
+    ["Ouroboros Study","Emblems","Sample Client","2023","Pen & ink","","nike-2026","6","serpent"]
+  ];
+  return d.map(([title,category,client,year,medium,notes,collection,order,motif],i)=>({
+    title,category,client,year,medium,notes,collection,order,
+    image:ornamentSVG(roman(i+1),motif),thumb:""
+  }));
+}
+
+/* ============================================================
+   APP STATE + RENDER
+   ============================================================ */
+let ALL=[],VIEW=[],activeCat="All",pitchMode=false,pitchCollection="";
+const $=id=>document.getElementById(id);
+const roman=n=>{const m=[[1000,"M"],[900,"CM"],[500,"D"],[400,"CD"],[100,"C"],[90,"XC"],[50,"L"],[40,"XL"],[10,"X"],[9,"IX"],[5,"V"],[4,"IV"],[1,"I"]];let s="";for(const[v,r]of m){while(n>=v){s+=r;n-=v}}return s};
+
+function applyFilters(){
+  VIEW = ALL.filter(p=>{
+    const priv = (p.collection||"").trim();
+    if(pitchMode) return priv === pitchCollection || (!pitchCollection && priv);
+    if(priv) return false;                       // private plates hidden publicly
+    return activeCat==="All" || p.category===activeCat;
+  });
+  renderFolio();
+}
+
+function renderFolio(){
+  const folio=$("folio");
+  folio.innerHTML="";
+  if(!VIEW.length){
+    folio.innerHTML=`<section class="plate"><div class="plate-caption">
+      <div class="plate-no">Empty folio</div>
+      <div class="plate-sub">No plates match this index. Choose another category.</div></div></section>`;
+    return;
+  }
+  VIEW.forEach((p,i)=>{
+    const sec=document.createElement("section");
+    sec.className="plate";
+    sec.innerHTML=`
+      <div class="frame" role="button" tabindex="0" aria-label="Open ${p.title}">
+        ${["c-tl","c-tr","c-br","c-bl"].map(c=>cornerSVG(c)).join("")}
+        <img loading="lazy" src="${p.thumb||p.image}" alt="${esc(p.title)}">
+      </div>
+      <div class="plate-caption">
+        <div class="plate-no">Plate ${roman(i+1)}</div>
+        <div class="plate-title">${esc(p.title)}</div>
+        ${p.client?`<div class="plate-sub">${esc(p.client)}${p.year?", "+esc(p.year):""}</div>`:(p.year?`<div class="plate-sub">${esc(p.year)}</div>`:"")}
+      </div>
+      ${i===0?'<div class="scroll-hint">▾</div>':""}`;
+    const img=sec.querySelector("img");
+    img.addEventListener("load",()=>img.classList.add("loaded"));
+    if(img.complete) img.classList.add("loaded");
+    const open=()=>openDetail(p,i);
+    sec.querySelector(".frame").addEventListener("click",open);
+    sec.querySelector(".frame").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open()}});
+    folio.appendChild(sec);
+  });
+  folio.scrollTop=0;
+}
+function cornerSVG(cls){
+  return `<svg class="corner ${cls}" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.3">
+    <path d="M1 21 L1 6 Q1 1 6 1 L21 1"/><path d="M5 21 L5 9 Q5 5 9 5 L21 5" opacity=".5"/><circle cx="1" cy="1" r="1.2" fill="currentColor" stroke="none"/></svg>`;
+}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- categories ---------- */
+function renderIndex(){
+  const cats=["All",...new Set(ALL.filter(p=>!(p.collection||"").trim()).map(p=>p.category).filter(Boolean))];
+  $("catList").innerHTML=cats.map(c=>`<li><button data-cat="${esc(c)}" class="${c===activeCat?"active":""}">${esc(c)}</button></li>`).join("");
+  $("catList").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+    activeCat=b.dataset.cat;pitchMode=false;document.body.classList.remove("pitch");
+    applyFilters();renderIndex();closePanel("indexPanel");
+  }));
+  $("plateCount").textContent=`${VIEW.length} plate${VIEW.length===1?"":"s"} on display`;
+}
+
+/* ---------- detail overlay + pinch zoom ---------- */
+let Z={scale:1,x:0,y:0,pointers:new Map(),lastDist:0,lastMid:null};
+function openDetail(p){
+  $("zoomImg").src=p.image;
+  $("zoomImg").alt=p.title;
+  resetZoom();
+  const meta=[p.client&&`for <em>${esc(p.client)}</em>`,p.year&&esc(p.year),p.medium&&esc(p.medium)].filter(Boolean).join(" · ");
+  $("detailSheet").innerHTML=`
+    <div class="plate-no">Plate ${roman(VIEW.indexOf(p)+1)}</div>
+    <h2>${esc(p.title)}</h2>
+    ${meta?`<div class="detail-meta">${meta}</div>`:""}
+    ${p.notes?`<div class="detail-notes">${esc(p.notes)}</div>`:""}
+    <div class="detail-contact"><a href="mailto:${CONFIG.CONTACT_EMAIL}?subject=${encodeURIComponent("Inquiry — "+p.title)}">Licensing &amp; commissions</a></div>`;
+  $("overlay").classList.add("open");
+  $("zoomNote").style.opacity=1;
+  setTimeout(()=>$("zoomNote").style.opacity=0,2600);
+}
+function resetZoom(){Z.scale=1;Z.x=0;Z.y=0;applyZoom()}
+function applyZoom(){$("zoomImg").style.transform=`translate(${Z.x}px,${Z.y}px) scale(${Z.scale})`}
+function bindZoom(){
+  const st=$("zoomStage"),img=$("zoomImg");
+  st.addEventListener("pointerdown",e=>{st.setPointerCapture(e.pointerId);Z.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});Z.lastDist=0});
+  st.addEventListener("pointermove",e=>{
+    if(!Z.pointers.has(e.pointerId))return;
+    const prev=Z.pointers.get(e.pointerId);
+    Z.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    const pts=[...Z.pointers.values()];
+    if(pts.length===2){
+      const dist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+      const mid={x:(pts[0].x+pts[1].x)/2,y:(pts[0].y+pts[1].y)/2};
+      if(Z.lastDist){
+        const f=dist/Z.lastDist;
+        const ns=Math.min(6,Math.max(1,Z.scale*f));
+        const rf=ns/Z.scale;
+        Z.x=mid.x-(mid.x-Z.x)*rf; Z.y=mid.y-(mid.y-Z.y)*rf; Z.scale=ns;
+        if(Z.lastMid){Z.x+=mid.x-Z.lastMid.x;Z.y+=mid.y-Z.lastMid.y}
+        applyZoom();
+      }
+      Z.lastDist=dist;Z.lastMid=mid;
+    }else if(pts.length===1&&Z.scale>1){
+      Z.x+=e.clientX-prev.x;Z.y+=e.clientY-prev.y;applyZoom();
+    }
+  });
+  const lift=e=>{Z.pointers.delete(e.pointerId);Z.lastDist=0;Z.lastMid=null;if(Z.scale<=1.02)resetZoom()};
+  st.addEventListener("pointerup",lift);st.addEventListener("pointercancel",lift);
+  st.addEventListener("dblclick",()=>{Z.scale=Z.scale>1?1:2.5;if(Z.scale===1){Z.x=0;Z.y=0}applyZoom()});
+  st.addEventListener("wheel",e=>{e.preventDefault();
+    const ns=Math.min(6,Math.max(1,Z.scale*(e.deltaY<0?1.12:0.9)));
+    const rf=ns/Z.scale;Z.x=e.clientX-(e.clientX-Z.x)*rf;Z.y=e.clientY-(e.clientY-Z.y)*rf;Z.scale=ns;
+    if(Z.scale===1){Z.x=0;Z.y=0}applyZoom();
+  },{passive:false});
+}
+
+/* ---------- panels ---------- */
+function openPanel(id){$(id).classList.add("open")}
+function closePanel(id){$(id).classList.remove("open")}
+
+/* ---------- pitch mode ---------- */
+function tryPitch(pin){
+  if(pin===CONFIG.PITCH_PIN){
+    pitchMode=true;document.body.classList.add("pitch");
+    const url=new URL(location.href);
+    pitchCollection=(url.searchParams.get("c")||"").trim();
+    $("pitchBanner").textContent=pitchCollection?`Private — ${pitchCollection}`:"Private Selection";
+    closePanel("pinPanel");closePanel("indexPanel");
+    applyFilters();
+  }else{
+    $("pinInput").value="";$("pinInput").placeholder="";
+    $("pinInput").style.borderColor="var(--oxblood)";
+    setTimeout(()=>$("pinInput").style.borderColor="",900);
+  }
+}
+
+/* ---------- boot ---------- */
+async function boot(){
+  bindZoom();
+  $("indexBtn").addEventListener("click",()=>{renderIndex();openPanel("indexPanel")});
+  $("closeIndex").addEventListener("click",()=>closePanel("indexPanel"));
+  $("closeOverlay").addEventListener("click",()=>closePanel("overlay"));
+  $("pitchLink").addEventListener("click",()=>{closePanel("indexPanel");openPanel("pinPanel");$("pinInput").focus()});
+  $("pinGo").addEventListener("click",()=>tryPitch($("pinInput").value.trim()));
+  $("pinCancel").addEventListener("click",()=>closePanel("pinPanel"));
+  $("pinInput").addEventListener("keydown",e=>{if(e.key==="Enter")tryPitch($("pinInput").value.trim())});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"){closePanel("overlay");closePanel("indexPanel");closePanel("pinPanel")}});
+
+  ALL=await loadPortfolio();
+  applyFilters();
+  // deep link: ?c=collection prompts for PIN on arrival
+  if(new URL(location.href).searchParams.get("c")) openPanel("pinPanel");
+  $("veil").classList.add("hidden");
+
+  if("serviceWorker" in navigator && location.protocol==="https:"){
+    navigator.serviceWorker.register("sw.js").catch(()=>{});
+  }
+}
+boot();
+</script>
+</body>
+</html>
