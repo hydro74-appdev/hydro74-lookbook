@@ -253,7 +253,7 @@ body.pitch .pitch-banner{display:block}
   <div class="rule"></div>
   <ul class="cat-list" id="catList"></ul>
   <div class="index-foot" id="plateCount"></div>
-  <button class="pitch-link" id="pitchLink">Private access</button>
+  <button class="pitch-link" id="lockBtn">Lock folio</button>
   <br><button class="close-btn" id="closeIndex" style="margin-top:10px">Close</button>
 </div>
 
@@ -263,7 +263,7 @@ body.pitch .pitch-banner{display:block}
   <div class="rule"></div>
   <div class="pin-slots" id="pinSlots"></div>
   <div class="keypad" id="keypad"></div>
-  <div class="pin-cancel-row"><button class="close-btn" id="pinCancel">Cancel</button></div>
+  
 </div>
 
 <!-- loading veil -->
@@ -282,7 +282,14 @@ const CONFIG = {
   SHEET_ID: "1qf5I-aQLGhZCwXikFRLPg1iLWUSZ_Y870l3eHKW6w_0",
   SHEET_TAB: "Plates",          // tab name inside the spreadsheet
   CONTACT_EMAIL: "licensing@hydro74.com",
-  PITCH_PIN: "7474",            // change before shipping
+  PIN_LENGTH: 4,
+  // The whole app is gated. Each PIN maps to what it unlocks:
+  //   "*"            = the full public folio
+  //   a collection   = only plates tagged with that collection (v2.0 client lookbooks)
+  PINS: {
+    "7474": "*",              // master — change before shipping
+    "1213": "nike-2026"       // demo of a per-client lookbook pin
+  },
   BRAND: "HYDRO74"
 };
 
@@ -371,15 +378,15 @@ function cdn(url,width){
 /* ============================================================
    APP STATE + RENDER
    ============================================================ */
-let ALL=[],VIEW=[],activeCat="All",pitchMode=false,pitchCollection="";
+let ALL=[],VIEW=[],activeCat="All",unlocked=false,scope="*";
 const $=id=>document.getElementById(id);
 const roman=n=>{const m=[[1000,"M"],[900,"CM"],[500,"D"],[400,"CD"],[100,"C"],[90,"XC"],[50,"L"],[40,"XL"],[10,"X"],[9,"IX"],[5,"V"],[4,"IV"],[1,"I"]];let s="";for(const[v,r]of m){while(n>=v){s+=r;n-=v}}return s};
 
 function applyFilters(){
   VIEW = ALL.filter(p=>{
-    const priv = (p.collection||"").trim();
-    if(pitchMode) return priv === pitchCollection || (!pitchCollection && priv);
-    if(priv) return false;                       // private plates hidden publicly
+    const tag = (p.collection||"").trim();
+    if(scope !== "*") return tag === scope;      // client lookbook: only its plates
+    if(tag) return false;                        // full folio: collection plates stay hidden
     return activeCat==="All" || p.category===activeCat;
   });
   renderFolio();
@@ -495,23 +502,23 @@ function closePanel(id){$(id).classList.remove("open")}
 /* ---------- pitch mode: keypad entry ---------- */
 let pinBuf="";
 function renderSlots(){
-  const n=CONFIG.PITCH_PIN.length;
+  const n=CONFIG.PIN_LENGTH;
   $("pinSlots").innerHTML=Array.from({length:n},(_,i)=>
     `<div class="pin-slot ${i<pinBuf.length?"filled":""}"></div>`).join("");
 }
 function pinPress(k){
   if(k==="back"){pinBuf=pinBuf.slice(0,-1);renderSlots();return}
   if(k==="clear"){pinBuf="";renderSlots();return}
-  if(pinBuf.length>=CONFIG.PITCH_PIN.length)return;
+  if(pinBuf.length>=CONFIG.PIN_LENGTH)return;
   pinBuf+=k;renderSlots();
-  if(pinBuf.length===CONFIG.PITCH_PIN.length) setTimeout(tryPitch,140);
+  if(pinBuf.length===CONFIG.PIN_LENGTH) setTimeout(tryUnlock,140);
 }
-function tryPitch(){
-  if(pinBuf===CONFIG.PITCH_PIN){
-    pitchMode=true;document.body.classList.add("pitch");
-    const url=new URL(location.href);
-    pitchCollection=(url.searchParams.get("c")||"").trim();
-    $("pitchBanner").textContent=pitchCollection?`Private — ${pitchCollection}`:"Private Selection";
+function tryUnlock(){
+  const grant = CONFIG.PINS[pinBuf];
+  if(grant !== undefined){
+    unlocked=true; scope=grant; activeCat="All";
+    document.body.classList.toggle("pitch", scope!=="*");
+    $("pitchBanner").textContent = scope!=="*" ? `Private — ${scope}` : "";
     pinBuf="";renderSlots();
     closePanel("pinPanel");closePanel("indexPanel");
     applyFilters();
@@ -520,6 +527,12 @@ function tryPitch(){
     s.classList.add("deny","shake");
     setTimeout(()=>{s.classList.remove("deny","shake");pinBuf="";renderSlots()},520);
   }
+}
+function lockFolio(){
+  unlocked=false; scope="*"; activeCat="All"; pinBuf="";
+  document.body.classList.remove("pitch");
+  renderSlots(); closePanel("indexPanel"); closePanel("overlay");
+  openPanel("pinPanel");
 }
 function buildKeypad(){
   const keys=["1","2","3","4","5","6","7","8","9","clear","0","back"];
@@ -538,14 +551,13 @@ async function boot(){
   $("closeIndex").addEventListener("click",()=>closePanel("indexPanel"));
   $("closeOverlay").addEventListener("click",()=>closePanel("overlay"));
   buildKeypad();renderSlots();
-  $("pitchLink").addEventListener("click",()=>{closePanel("indexPanel");pinBuf="";renderSlots();openPanel("pinPanel")});
-  $("pinCancel").addEventListener("click",()=>{pinBuf="";renderSlots();closePanel("pinPanel")});
+  $("lockBtn").addEventListener("click",lockFolio);
   document.addEventListener("keydown",e=>{
     if(!$("pinPanel").classList.contains("open"))return;
     if(/^[0-9]$/.test(e.key))pinPress(e.key);
     else if(e.key==="Backspace")pinPress("back");
   });
-  document.addEventListener("keydown",e=>{if(e.key==="Escape"){closePanel("overlay");closePanel("indexPanel");closePanel("pinPanel")}});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"){closePanel("overlay");closePanel("indexPanel")}});
 
   const splashStart=performance.now();
   ALL=await loadPortfolio();
@@ -555,8 +567,8 @@ async function boot(){
   const remaining=Math.max(0,MIN_SPLASH-(performance.now()-splashStart));
   await new Promise(r=>setTimeout(r,remaining));
   $("veil").classList.add("hidden");
-  // deep link: ?c=collection prompts for PIN after the splash clears
-  if(new URL(location.href).searchParams.get("c")){pinBuf="";renderSlots();openPanel("pinPanel")}
+  // the folio is gated: keypad greets every arrival
+  openPanel("pinPanel");
 
   if("serviceWorker" in navigator && location.protocol==="https:"){
     navigator.serviceWorker.register("sw.js").catch(()=>{});
