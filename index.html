@@ -186,16 +186,31 @@ body.pitch .wm-text b{color:var(--oxblood)}
 body.pitch .pitch-banner{display:block}
 .pin-panel{
   position:fixed;inset:0;z-index:80;background:rgba(11,10,8,.97);
-  display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:26px;
 }
 .pin-panel.open{display:flex}
-.pin-panel input{
-  background:var(--ink-2);border:1px solid var(--gold-dim);color:var(--bone);
-  font-family:'Cinzel',serif;font-size:22px;letter-spacing:.5em;text-align:center;
-  width:200px;padding:12px 0 10px;outline:none;
+.pin-slots{display:flex;gap:18px}
+.pin-slot{
+  width:16px;height:16px;transform:rotate(45deg);
+  border:1px solid var(--gold-dim);transition:background .18s,border-color .18s;
 }
-.pin-panel input:focus{border-color:var(--gold)}
-.pin-actions{display:flex;gap:14px}
+.pin-slot.filled{background:var(--gold);border-color:var(--gold)}
+.pin-slots.deny .pin-slot{background:var(--oxblood);border-color:var(--oxblood)}
+.pin-slots.shake{animation:pinShake .4s}
+@keyframes pinShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@media (prefers-reduced-motion:reduce){.pin-slots.shake{animation:none}}
+.keypad{display:grid;grid-template-columns:repeat(3,72px);gap:12px}
+.keypad button{
+  height:60px;background:none;border:1px solid var(--gold-dim);color:var(--bone);
+  font-family:'Cinzel',serif;font-size:20px;cursor:pointer;
+  transition:color .15s,border-color .15s,background .15s;
+}
+.keypad button:active{background:var(--ink-2);color:var(--gold);border-color:var(--gold)}
+.keypad button:hover,.keypad button:focus-visible{color:var(--gold);border-color:var(--gold);outline:none}
+.keypad .kp-util{font-size:14px;color:var(--bone-dim)}
+.pin-cancel-row{margin-top:2px}
+/* splash fade */
+.status-veil{transition:opacity .8s ease}
 
 /* ---------- loading / empty ---------- */
 .status-veil{
@@ -241,13 +256,12 @@ body.pitch .pitch-banner{display:block}
 </div>
 
 <!-- pitch PIN -->
-<div class="pin-panel" id="pinPanel" role="dialog" aria-modal="true">
+<div class="pin-panel" id="pinPanel" role="dialog" aria-modal="true" aria-label="Private access code">
   <div class="index-title">Private Selection</div>
-  <input id="pinInput" type="password" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="Access code">
-  <div class="pin-actions">
-    <button class="close-btn" id="pinGo">Enter</button>
-    <button class="close-btn" id="pinCancel">Cancel</button>
-  </div>
+  <div class="rule"></div>
+  <div class="pin-slots" id="pinSlots"></div>
+  <div class="keypad" id="keypad"></div>
+  <div class="pin-cancel-row"><button class="close-btn" id="pinCancel">Cancel</button></div>
 </div>
 
 <!-- loading veil -->
@@ -464,20 +478,43 @@ function bindZoom(){
 function openPanel(id){$(id).classList.add("open")}
 function closePanel(id){$(id).classList.remove("open")}
 
-/* ---------- pitch mode ---------- */
-function tryPitch(pin){
-  if(pin===CONFIG.PITCH_PIN){
+/* ---------- pitch mode: keypad entry ---------- */
+let pinBuf="";
+function renderSlots(){
+  const n=CONFIG.PITCH_PIN.length;
+  $("pinSlots").innerHTML=Array.from({length:n},(_,i)=>
+    `<div class="pin-slot ${i<pinBuf.length?"filled":""}"></div>`).join("");
+}
+function pinPress(k){
+  if(k==="back"){pinBuf=pinBuf.slice(0,-1);renderSlots();return}
+  if(k==="clear"){pinBuf="";renderSlots();return}
+  if(pinBuf.length>=CONFIG.PITCH_PIN.length)return;
+  pinBuf+=k;renderSlots();
+  if(pinBuf.length===CONFIG.PITCH_PIN.length) setTimeout(tryPitch,140);
+}
+function tryPitch(){
+  if(pinBuf===CONFIG.PITCH_PIN){
     pitchMode=true;document.body.classList.add("pitch");
     const url=new URL(location.href);
     pitchCollection=(url.searchParams.get("c")||"").trim();
     $("pitchBanner").textContent=pitchCollection?`Private — ${pitchCollection}`:"Private Selection";
+    pinBuf="";renderSlots();
     closePanel("pinPanel");closePanel("indexPanel");
     applyFilters();
   }else{
-    $("pinInput").value="";$("pinInput").placeholder="";
-    $("pinInput").style.borderColor="var(--oxblood)";
-    setTimeout(()=>$("pinInput").style.borderColor="",900);
+    const s=$("pinSlots");
+    s.classList.add("deny","shake");
+    setTimeout(()=>{s.classList.remove("deny","shake");pinBuf="";renderSlots()},520);
   }
+}
+function buildKeypad(){
+  const keys=["1","2","3","4","5","6","7","8","9","clear","0","back"];
+  $("keypad").innerHTML=keys.map(k=>{
+    const label=k==="clear"?"✕":k==="back"?"⌫":k;
+    const cls=(k==="clear"||k==="back")?"kp-util":"";
+    return `<button class="${cls}" data-k="${k}" aria-label="${k}">${label}</button>`;
+  }).join("");
+  $("keypad").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>pinPress(b.dataset.k)));
 }
 
 /* ---------- boot ---------- */
@@ -486,17 +523,26 @@ async function boot(){
   $("indexBtn").addEventListener("click",()=>{renderIndex();openPanel("indexPanel")});
   $("closeIndex").addEventListener("click",()=>closePanel("indexPanel"));
   $("closeOverlay").addEventListener("click",()=>closePanel("overlay"));
-  $("pitchLink").addEventListener("click",()=>{closePanel("indexPanel");openPanel("pinPanel");$("pinInput").focus()});
-  $("pinGo").addEventListener("click",()=>tryPitch($("pinInput").value.trim()));
-  $("pinCancel").addEventListener("click",()=>closePanel("pinPanel"));
-  $("pinInput").addEventListener("keydown",e=>{if(e.key==="Enter")tryPitch($("pinInput").value.trim())});
+  buildKeypad();renderSlots();
+  $("pitchLink").addEventListener("click",()=>{closePanel("indexPanel");pinBuf="";renderSlots();openPanel("pinPanel")});
+  $("pinCancel").addEventListener("click",()=>{pinBuf="";renderSlots();closePanel("pinPanel")});
+  document.addEventListener("keydown",e=>{
+    if(!$("pinPanel").classList.contains("open"))return;
+    if(/^[0-9]$/.test(e.key))pinPress(e.key);
+    else if(e.key==="Backspace")pinPress("back");
+  });
   document.addEventListener("keydown",e=>{if(e.key==="Escape"){closePanel("overlay");closePanel("indexPanel");closePanel("pinPanel")}});
 
+  const splashStart=performance.now();
   ALL=await loadPortfolio();
   applyFilters();
-  // deep link: ?c=collection prompts for PIN on arrival
-  if(new URL(location.href).searchParams.get("c")) openPanel("pinPanel");
+  // hold the logo splash for a deliberate beat (min 2.2s), then fade
+  const MIN_SPLASH=2200;
+  const remaining=Math.max(0,MIN_SPLASH-(performance.now()-splashStart));
+  await new Promise(r=>setTimeout(r,remaining));
   $("veil").classList.add("hidden");
+  // deep link: ?c=collection prompts for PIN after the splash clears
+  if(new URL(location.href).searchParams.get("c")){pinBuf="";renderSlots();openPanel("pinPanel")}
 
   if("serviceWorker" in navigator && location.protocol==="https:"){
     navigator.serviceWorker.register("sw.js").catch(()=>{});
