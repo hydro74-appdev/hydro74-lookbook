@@ -356,6 +356,18 @@ function demoPlates(){
   }));
 }
 
+
+/* Cloudinary auto-optimize: paste the plain copied URL into the Sheet and
+   the app inserts sizing/format transforms itself. URLs that already
+   contain transforms, or non-Cloudinary URLs, pass through untouched. */
+function cdn(url,width){
+  if(!url || !url.includes("res.cloudinary.com") || !url.includes("/upload/")) return url;
+  const [head,tail] = url.split("/upload/");
+  const seg = tail.split("/")[0];
+  if(/(^|,)(w_|h_|c_|q_|f_)/.test(seg)) return url;   // already transformed
+  return `${head}/upload/w_${width},q_auto,f_auto/${tail}`;
+}
+
 /* ============================================================
    APP STATE + RENDER
    ============================================================ */
@@ -388,7 +400,7 @@ function renderFolio(){
     sec.innerHTML=`
       <div class="frame" role="button" tabindex="0" aria-label="Open ${p.title}">
         ${["c-tl","c-tr","c-br","c-bl"].map(c=>cornerSVG(c)).join("")}
-        <img loading="lazy" src="${p.thumb||p.image}" alt="${esc(p.title)}">
+        <img loading="lazy" src="${cdn(p.thumb||p.image,800)}" alt="${esc(p.title)}">
       </div>
       <div class="plate-caption">
         <div class="plate-no">Plate ${roman(i+1)}</div>
@@ -426,7 +438,7 @@ function renderIndex(){
 /* ---------- detail overlay + pinch zoom ---------- */
 let Z={scale:1,x:0,y:0,pointers:new Map(),lastDist:0,lastMid:null};
 function openDetail(p){
-  $("zoomImg").src=p.image;
+  $("zoomImg").src=cdn(p.image,2000);
   $("zoomImg").alt=p.title;
   resetZoom();
   const meta=[p.client&&`for <em>${esc(p.client)}</em>`,p.year&&esc(p.year),p.medium&&esc(p.medium)].filter(Boolean).join(" · ");
