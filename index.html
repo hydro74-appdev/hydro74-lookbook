@@ -310,10 +310,10 @@ async function loadPortfolio(){
     const res = await fetch(url,{cache:"no-store"});
     const text = await res.text();
     const json = JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}")+1));
-    const cols = json.table.cols.map(c=>(c.label||"").toLowerCase().trim());
+    const FIELD_NAMES = ["title","image","thumb","category","client","year","medium","notes","collection","order"];
     const rows = json.table.rows.map(r=>{
       const o={};
-      cols.forEach((c,i)=>{ o[c] = r.c[i] ? (r.c[i].f ?? r.c[i].v ?? "") : ""; });
+      FIELD_NAMES.forEach((c,i)=>{ o[c] = r.c[i] ? (r.c[i].f ?? r.c[i].v ?? "") : ""; });
       return o;
     }).filter(o=>o.title && o.image);
     rows.sort((a,b)=>(Number(a.order)||9999)-(Number(b.order)||9999));
