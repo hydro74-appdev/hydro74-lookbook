@@ -507,7 +507,7 @@ function renderFolio(){
         </div>
       </div>
       ${i===0?'<div class="scroll-hint">▾</div>':""}`;
-    const img=sec.querySelector("img");
+    const img=sec.querySelector(".frame img");
     img.addEventListener("load",()=>img.classList.add("loaded"));
     if(img.complete) img.classList.add("loaded");
     const open=()=>openDetail(p,i);
