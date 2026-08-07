@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-<meta name="theme-color" content="#0b0a08">
+<meta name="theme-color" content="#000000">
 <meta name="description" content="The Hydro74 Lookbook — a folio of selected works.">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -14,29 +14,30 @@
 <title>HYDRO74 — Lookbook</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet">
 <style>
+@font-face{font-family:'H74 SUBVERT';src:url('fonts/H74Subvert.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap}
 /* ============================================================
-   HYDRO74 LOOKBOOK — "The Folio"
-   Ink black · aged gold · bone ivory · oxblood
+   HYDRO74 LOOKBOOK — v2, matching the real Hydro74 brand
+   Pure black · bone/tan · mauve
    ============================================================ */
 :root{
-  --ink:#0b0a08;          /* ground */
-  --ink-2:#141210;        /* raised panels */
-  --gold:#c9a227;         /* bright gilt */
-  --gold-dim:#8a7226;     /* aged gilt / rules */
-  --bone:#e8e0ce;         /* primary text */
-  --bone-dim:#9a927f;     /* secondary text */
-  --oxblood:#6e1f1f;      /* rare accent: pitch mode, errors */
+  --ink:#000000;          /* ground */
+  --ink-2:#111111;        /* raised panels */
+  --gold:#BABF9C;         /* primary accent (bone/tan) */
+  --gold-dim:#94807D;     /* secondary accent (mauve) */
+  --bone:#BABF9C;         /* primary text */
+  --bone-dim:#94807D;     /* secondary text */
+  --oxblood:#6e1f1f;      /* functional only: pitch mode banner, deny state */
   --frame-inset:14px;
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--ink);color:var(--bone);overflow:hidden}
-body{font-family:'Cormorant Garamond',Georgia,serif;font-size:17px}
+body{font-family:'Space Grotesk',sans-serif;font-size:17px}
 
-.caps{font-family:'Cinzel',serif;letter-spacing:.22em;text-transform:uppercase}
+.caps{font-family:'H74 SUBVERT',sans-serif;letter-spacing:.04em;text-transform:uppercase}
 
 /* ---------- top bar ---------- */
 header{
@@ -52,7 +53,7 @@ header>*{pointer-events:auto}
 .wm-text{font-size:11px;color:var(--bone-dim);font-weight:400}
 .wm-text b{color:var(--gold);font-weight:600}
 .index-btn{
-  font-family:'Cinzel',serif;font-size:10px;letter-spacing:.28em;text-transform:uppercase;
+  font-family:'H74 SUBVERT',sans-serif;font-size:10px;letter-spacing:.06em;text-transform:uppercase;
   color:var(--bone-dim);background:none;border:1px solid var(--gold-dim);
   padding:7px 13px 6px;cursor:pointer;transition:color .25s,border-color .25s;
 }
@@ -96,11 +97,11 @@ main::-webkit-scrollbar{display:none}
 .frame img.loaded{opacity:1}
 .plate-caption{margin-top:16px;text-align:center;flex-shrink:0}
 .plate-no{
-  font-family:'Cinzel',serif;font-size:10px;letter-spacing:.3em;color:var(--gold-dim);
+  font-family:'H74 SUBVERT',sans-serif;font-size:10px;letter-spacing:.06em;color:var(--gold-dim);
   margin-bottom:5px;
 }
 .plate-title{
-  font-family:'Cinzel',serif;font-weight:600;font-size:15px;letter-spacing:.14em;
+  font-family:'H74 SUBVERT',sans-serif;font-weight:600;font-size:15px;letter-spacing:.14em;
   text-transform:uppercase;color:var(--bone);
 }
 .plate-sub{font-size:15px;font-style:italic;color:var(--bone-dim);margin-top:3px}
@@ -123,7 +124,7 @@ main::-webkit-scrollbar{display:none}
 .overlay-top{display:flex;justify-content:flex-end;padding:0 16px}
 .close-btn{
   background:none;border:1px solid var(--gold-dim);color:var(--bone-dim);
-  font-family:'Cinzel',serif;font-size:10px;letter-spacing:.24em;padding:7px 13px 6px;
+  font-family:'H74 SUBVERT',sans-serif;font-size:10px;letter-spacing:.05em;padding:7px 13px 6px;
   cursor:pointer;
 }
 .close-btn:hover{color:var(--gold);border-color:var(--gold)}
@@ -136,21 +137,21 @@ main::-webkit-scrollbar{display:none}
   user-select:none;-webkit-user-drag:none;
 }
 .zoom-note{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:10px;
-  font-family:'Cinzel',serif;letter-spacing:.24em;color:var(--gold-dim);text-transform:uppercase;
+  font-family:'H74 SUBVERT',sans-serif;letter-spacing:.05em;color:var(--gold-dim);text-transform:uppercase;
   pointer-events:none;transition:opacity .5s}
 .detail-sheet{
   border-top:1px solid var(--gold-dim);padding:14px 22px 18px;text-align:center;
   max-height:38vh;overflow-y:auto;
 }
 .detail-sheet .plate-no{margin-bottom:6px}
-.detail-sheet h2{font-family:'Cinzel',serif;font-weight:600;font-size:17px;letter-spacing:.14em;text-transform:uppercase}
+.detail-sheet h2{font-family:'H74 SUBVERT',sans-serif;font-weight:600;font-size:17px;letter-spacing:.14em;text-transform:uppercase}
 .detail-meta{margin-top:6px;color:var(--bone-dim);font-size:15px}
 .detail-meta em{color:var(--bone)}
 .detail-notes{margin-top:10px;font-size:16px;line-height:1.55;color:var(--bone);
   max-width:46ch;margin-left:auto;margin-right:auto}
 .detail-contact{margin-top:12px}
-.detail-contact a{color:var(--gold);text-decoration:none;font-family:'Cinzel',serif;
-  font-size:11px;letter-spacing:.24em;text-transform:uppercase;border-bottom:1px solid var(--gold-dim);padding-bottom:2px}
+.detail-contact a{color:var(--gold);text-decoration:none;font-family:'H74 SUBVERT',sans-serif;
+  font-size:11px;letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--gold-dim);padding-bottom:2px}
 
 /* ---------- index (filter) panel ---------- */
 .index-panel{
@@ -160,7 +161,7 @@ main::-webkit-scrollbar{display:none}
   text-align:center;
 }
 .index-panel.open{display:flex}
-.index-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.34em;color:var(--gold-dim);
+.index-title{font-family:'H74 SUBVERT',sans-serif;font-size:11px;letter-spacing:.08em;color:var(--gold-dim);
   text-transform:uppercase;margin-bottom:22px}
 .rule{width:64px;height:1px;background:var(--gold-dim);margin:0 auto 26px;position:relative}
 .rule::after{content:"◆";position:absolute;top:-8px;left:50%;transform:translateX(-50%);
@@ -168,7 +169,7 @@ main::-webkit-scrollbar{display:none}
 .cat-list{list-style:none;display:flex;flex-direction:column;gap:16px}
 .cat-list button{
   background:none;border:none;color:var(--bone-dim);cursor:pointer;
-  font-family:'Cinzel',serif;font-size:16px;letter-spacing:.2em;text-transform:uppercase;
+  font-family:'H74 SUBVERT',sans-serif;font-size:16px;letter-spacing:.2em;text-transform:uppercase;
   transition:color .25s;padding:4px 8px;
 }
 .cat-list button:hover,.cat-list button:focus-visible{color:var(--gold);outline:none}
@@ -176,13 +177,13 @@ main::-webkit-scrollbar{display:none}
 .cat-list button.active::before,.cat-list button.active::after{content:" · ";color:var(--gold-dim)}
 .index-foot{margin-top:34px;font-style:italic;color:var(--bone-dim);font-size:15px}
 .pitch-link{margin-top:18px;background:none;border:none;color:var(--gold-dim);cursor:pointer;
-  font-family:'Cinzel',serif;font-size:9px;letter-spacing:.3em;text-transform:uppercase}
+  font-family:'H74 SUBVERT',sans-serif;font-size:9px;letter-spacing:.06em;text-transform:uppercase}
 
 /* ---------- pitch mode ---------- */
 body.pitch .wm-text b{color:var(--oxblood)}
 .pitch-banner{
   display:none;position:fixed;top:calc(44px + var(--safe-top));left:50%;transform:translateX(-50%);
-  z-index:39;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.3em;text-transform:uppercase;
+  z-index:39;font-family:'H74 SUBVERT',sans-serif;font-size:9px;letter-spacing:.06em;text-transform:uppercase;
   color:var(--bone);background:var(--oxblood);padding:5px 14px 4px;
 }
 body.pitch .pitch-banner{display:block}
@@ -204,7 +205,7 @@ body.pitch .pitch-banner{display:block}
 .keypad{display:grid;grid-template-columns:repeat(3,72px);gap:12px}
 .keypad button{
   height:60px;background:none;border:1px solid var(--gold-dim);color:var(--bone);
-  font-family:'Cinzel',serif;font-size:20px;cursor:pointer;
+  font-family:'H74 SUBVERT',sans-serif;font-size:20px;cursor:pointer;
   transition:color .15s,border-color .15s,background .15s;
 }
 .keypad button:active{background:var(--ink-2);color:var(--gold);border-color:var(--gold)}
@@ -224,7 +225,7 @@ body.pitch .pitch-banner{display:block}
 .seal{width:74px;height:74px;color:var(--gold);animation:sealPulse 2.2s ease-in-out infinite}
 @keyframes sealPulse{0%,100%{opacity:.55}50%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.seal{animation:none}}
-.status-text{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.32em;color:var(--bone-dim);text-transform:uppercase}
+.status-text{font-family:'H74 SUBVERT',sans-serif;font-size:10px;letter-spacing:.07em;color:var(--bone-dim);text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -310,7 +311,7 @@ async function loadPortfolio(){
     const res = await fetch(url,{cache:"no-store"});
     const text = await res.text();
     const json = JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}")+1));
-    const FIELD_NAMES = ["title","image","thumb","category","client","year","medium","notes","collection","order"];
+    const FIELD_NAMES = ["title","image","thumb","category","client","year","medium","notes","collection","order","image_vertical"];
     const rows = json.table.rows.map(r=>{
       const o={};
       FIELD_NAMES.forEach((c,i)=>{ o[c] = r.c[i] ? (r.c[i].f ?? r.c[i].v ?? "") : ""; });
@@ -359,7 +360,7 @@ function demoPlates(){
   ];
   return d.map(([title,category,client,year,medium,notes,collection,order,motif],i)=>({
     title,category,client,year,medium,notes,collection,order,
-    image:ornamentSVG(roman(i+1),motif),thumb:""
+    image:ornamentSVG(roman(i+1),motif),thumb:"",image_vertical:""
   }));
 }
 
@@ -373,6 +374,16 @@ function cdn(url,width){
   const seg = tail.split("/")[0];
   if(/(^|,)(w_|h_|c_|q_|f_)/.test(seg)) return url;   // already transformed
   return `${head}/upload/w_${width},q_auto,f_auto/${tail}`;
+}
+
+/* Dual image support: a plate can have a vertical and a horizontal
+   version. Picks whichever matches the current device orientation,
+   falling back to the horizontal image if no vertical one exists yet
+   (so older Sheet rows without image_vertical still work unchanged). */
+function pickImage(p){
+  const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+  if(isPortrait && p.image_vertical) return p.image_vertical;
+  return p.image;
 }
 
 /* ============================================================
@@ -407,7 +418,7 @@ function renderFolio(){
     sec.innerHTML=`
       <div class="frame" role="button" tabindex="0" aria-label="Open ${p.title}">
         ${["c-tl","c-tr","c-br","c-bl"].map(c=>cornerSVG(c)).join("")}
-        <img loading="lazy" src="${cdn(p.thumb||p.image,800)}" alt="${esc(p.title)}">
+        <img loading="lazy" src="${cdn(pickImage(p),800)}" alt="${esc(p.title)}">
       </div>
       <div class="plate-caption">
         <div class="plate-no">Plate ${roman(i+1)}</div>
@@ -445,7 +456,7 @@ function renderIndex(){
 /* ---------- detail overlay + pinch zoom ---------- */
 let Z={scale:1,x:0,y:0,pointers:new Map(),lastDist:0,lastMid:null};
 function openDetail(p){
-  $("zoomImg").src=cdn(p.image,2000);
+  $("zoomImg").src=cdn(pickImage(p),2000);
   $("zoomImg").alt=p.title;
   resetZoom();
   const meta=[p.client&&`for <em>${esc(p.client)}</em>`,p.year&&esc(p.year),p.medium&&esc(p.medium)].filter(Boolean).join(" · ");
@@ -545,6 +556,27 @@ function buildKeypad(){
 }
 
 /* ---------- boot ---------- */
+/* ---------- orientation change: swap images live if a device rotates ---------- */
+function updateImagesForOrientation(){
+  document.querySelectorAll("#folio .frame img").forEach((img,idx)=>{
+    const p=VIEW[idx];
+    if(!p) return;
+    const wanted=cdn(pickImage(p),800);
+    if(img.src!==wanted) img.src=wanted;
+  });
+  if($("overlay").classList.contains("open")){
+    const openTitle=$("detailSheet").querySelector("h2");
+    if(openTitle){
+      const p=VIEW.find(v=>v.title===openTitle.textContent);
+      if(p){
+        const wanted=cdn(pickImage(p),2000);
+        if($("zoomImg").src!==wanted){ $("zoomImg").src=wanted; resetZoom(); }
+      }
+    }
+  }
+}
+window.addEventListener("resize",updateImagesForOrientation);
+
 async function boot(){
   bindZoom();
   $("indexBtn").addEventListener("click",()=>{renderIndex();openPanel("indexPanel")});
