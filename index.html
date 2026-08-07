@@ -662,16 +662,25 @@ window.addEventListener("resize",updateImagesForOrientation);
 const isDesktop=()=>window.matchMedia("(min-width:880px)").matches;
 function bindDesktopNav(){
   const folio=$("folio");
+  let wheelLock=false;
+  const page=dir=>{
+    if(wheelLock)return;
+    wheelLock=true;
+    folio.scrollBy({left:dir*folio.clientWidth,behavior:"smooth"});
+    setTimeout(()=>{wheelLock=false},550);
+  };
   folio.addEventListener("wheel",e=>{
     if(!isDesktop())return;
     e.preventDefault();
-    folio.scrollLeft += (Math.abs(e.deltaY)>Math.abs(e.deltaX)?e.deltaY:e.deltaX);
+    const delta=Math.abs(e.deltaY)>Math.abs(e.deltaX)?e.deltaY:e.deltaX;
+    if(Math.abs(delta)<8)return;
+    page(delta>0?1:-1);
   },{passive:false});
   document.addEventListener("keydown",e=>{
     if(!isDesktop())return;
     if($("overlay").classList.contains("open")||$("indexPanel").classList.contains("open")||$("pinPanel").classList.contains("open"))return;
-    if(e.key==="ArrowRight") folio.scrollBy({left:folio.clientWidth,behavior:"smooth"});
-    else if(e.key==="ArrowLeft") folio.scrollBy({left:-folio.clientWidth,behavior:"smooth"});
+    if(e.key==="ArrowRight")page(1);
+    else if(e.key==="ArrowLeft")page(-1);
   });
 }
 
