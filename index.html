@@ -95,6 +95,9 @@ main::-webkit-scrollbar{display:none}
   opacity:0;transition:opacity .6s ease;
 }
 .frame img.loaded{opacity:1}
+.plate-main{display:contents}
+.plate-rail{display:none}
+.plate-headline{display:none}
 .plate-caption{margin-top:16px;text-align:center;flex-shrink:0}
 .plate-no{
   font-family:'H74 SUBVERT',sans-serif;font-size:10px;letter-spacing:.06em;color:var(--gold-dim);
@@ -226,6 +229,59 @@ body.pitch .pitch-banner{display:block}
 @keyframes sealPulse{0%,100%{opacity:.55}50%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.seal{animation:none}}
 .status-text{font-family:'H74 SUBVERT',sans-serif;font-size:10px;letter-spacing:.07em;color:var(--bone-dim);text-transform:uppercase}
+
+/* ============================================================
+   DESKTOP — landscape spread, horizontal navigation
+   ============================================================ */
+@media (min-width:880px){
+  main{scroll-snap-type:x mandatory;overflow-x:auto;overflow-y:hidden;display:flex}
+  .plate{
+    flex:0 0 100vw;width:100vw;height:100%;scroll-snap-align:start;
+    flex-direction:row;align-items:stretch;justify-content:flex-start;
+    padding:calc(64px + var(--safe-top)) 56px calc(48px + var(--safe-bottom)) 56px;
+    gap:0;
+  }
+  .plate-rail{
+    display:flex;flex-direction:column;justify-content:space-between;
+    width:210px;flex-shrink:0;padding:4px 32px 4px 0;
+    border-right:1px solid var(--gold-dim);margin-right:40px;
+  }
+  .rail-top{display:flex;flex-direction:column;gap:16px}
+  .rail-eyebrow{
+    font-family:'H74 SUBVERT',sans-serif;font-size:10px;letter-spacing:.1em;
+    color:var(--gold-dim);text-transform:uppercase;
+  }
+  .rail-mark{width:30px;height:auto;opacity:.85}
+  .rail-mid{display:flex;flex-direction:column;gap:14px}
+  .rail-field{font-size:13px;color:var(--bone)}
+  .rail-field span{
+    display:block;font-family:'H74 SUBVERT',sans-serif;font-size:9px;letter-spacing:.08em;
+    color:var(--bone-dim);text-transform:uppercase;margin-bottom:3px;
+  }
+  .rail-swatch{width:34px;height:34px;background:var(--gold);margin-top:4px}
+  .rail-bottom{display:flex;flex-direction:column;gap:6px}
+  .rail-tag{
+    font-family:'H74 SUBVERT',sans-serif;font-size:9px;letter-spacing:.07em;
+    color:var(--bone-dim);text-transform:uppercase;
+  }
+  .plate-main{
+    display:flex;flex-direction:column;flex:1;min-width:0;height:100%;
+  }
+  .plate-headline{display:block;flex-shrink:0;margin-bottom:22px}
+  .plate-title-lg{
+    font-family:'H74 SUBVERT',sans-serif;font-size:clamp(30px,4vw,52px);line-height:1;
+    letter-spacing:.01em;text-transform:uppercase;color:var(--bone);
+  }
+  .dash-rule{
+    margin-top:14px;height:1px;
+    background-image:repeating-linear-gradient(to right,var(--gold-dim) 0 10px,transparent 10px 16px);
+  }
+  .plate-main .frame{
+    max-width:100%;width:100%;flex:1;min-height:0;
+  }
+  .plate-main .plate-caption{display:none}
+  .scroll-hint{display:none}
+}
 </style>
 </head>
 <body>
@@ -415,15 +471,40 @@ function renderFolio(){
   VIEW.forEach((p,i)=>{
     const sec=document.createElement("section");
     sec.className="plate";
+    const railFields=[
+      p.client?`<div class="rail-field"><span>Client</span>${esc(p.client)}</div>`:"",
+      p.year?`<div class="rail-field"><span>Year</span>${esc(p.year)}</div>`:"",
+      p.medium?`<div class="rail-field"><span>Medium</span>${esc(p.medium)}</div>`:""
+    ].join("");
     sec.innerHTML=`
-      <div class="frame" role="button" tabindex="0" aria-label="Open ${p.title}">
-        ${["c-tl","c-tr","c-br","c-bl"].map(c=>cornerSVG(c)).join("")}
-        <img loading="lazy" src="${cdn(pickImage(p),800)}" alt="${esc(p.title)}">
+      <div class="plate-rail">
+        <div class="rail-top">
+          <div class="rail-eyebrow">${roman(i+1)} / ${p.category?esc(p.category).toUpperCase():"PLATE"}</div>
+          <img class="rail-mark" src="https://res.cloudinary.com/hydro74/image/upload/v1784347063/logo-mark_1_shvynx.png" alt="">
+        </div>
+        <div class="rail-mid">
+          ${railFields}
+          <div class="rail-swatch"></div>
+        </div>
+        <div class="rail-bottom">
+          <div class="rail-tag">H74 Lookbook</div>
+          <div class="rail-tag">Hydro74.com</div>
+        </div>
       </div>
-      <div class="plate-caption">
-        <div class="plate-no">Plate ${roman(i+1)}</div>
-        <div class="plate-title">${esc(p.title)}</div>
-        ${p.client?`<div class="plate-sub">${esc(p.client)}${p.year?", "+esc(p.year):""}</div>`:(p.year?`<div class="plate-sub">${esc(p.year)}</div>`:"")}
+      <div class="plate-main">
+        <div class="plate-headline">
+          <div class="plate-title-lg">${esc(p.title)}</div>
+          <div class="dash-rule"></div>
+        </div>
+        <div class="frame" role="button" tabindex="0" aria-label="Open ${p.title}">
+          ${["c-tl","c-tr","c-br","c-bl"].map(c=>cornerSVG(c)).join("")}
+          <img loading="lazy" src="${cdn(pickImage(p),800)}" alt="${esc(p.title)}">
+        </div>
+        <div class="plate-caption">
+          <div class="plate-no">Plate ${roman(i+1)}</div>
+          <div class="plate-title">${esc(p.title)}</div>
+          ${p.client?`<div class="plate-sub">${esc(p.client)}${p.year?", "+esc(p.year):""}</div>`:(p.year?`<div class="plate-sub">${esc(p.year)}</div>`:"")}
+        </div>
       </div>
       ${i===0?'<div class="scroll-hint">▾</div>':""}`;
     const img=sec.querySelector("img");
@@ -577,8 +658,26 @@ function updateImagesForOrientation(){
 }
 window.addEventListener("resize",updateImagesForOrientation);
 
+/* ---------- desktop: vertical wheel input drives horizontal paging ---------- */
+const isDesktop=()=>window.matchMedia("(min-width:880px)").matches;
+function bindDesktopNav(){
+  const folio=$("folio");
+  folio.addEventListener("wheel",e=>{
+    if(!isDesktop())return;
+    e.preventDefault();
+    folio.scrollLeft += (Math.abs(e.deltaY)>Math.abs(e.deltaX)?e.deltaY:e.deltaX);
+  },{passive:false});
+  document.addEventListener("keydown",e=>{
+    if(!isDesktop())return;
+    if($("overlay").classList.contains("open")||$("indexPanel").classList.contains("open")||$("pinPanel").classList.contains("open"))return;
+    if(e.key==="ArrowRight") folio.scrollBy({left:folio.clientWidth,behavior:"smooth"});
+    else if(e.key==="ArrowLeft") folio.scrollBy({left:-folio.clientWidth,behavior:"smooth"});
+  });
+}
+
 async function boot(){
   bindZoom();
+  bindDesktopNav();
   $("indexBtn").addEventListener("click",()=>{renderIndex();openPanel("indexPanel")});
   $("closeIndex").addEventListener("click",()=>closePanel("indexPanel"));
   $("closeOverlay").addEventListener("click",()=>closePanel("overlay"));
