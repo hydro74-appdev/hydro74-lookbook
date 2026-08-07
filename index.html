@@ -367,10 +367,20 @@ async function loadPortfolio(){
     const res = await fetch(url,{cache:"no-store"});
     const text = await res.text();
     const json = JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}")+1));
-    const FIELD_NAMES = ["title","image","thumb","category","client","year","medium","notes","collection","order","image_vertical"];
+    const KNOWN = ["title","image","thumb","category","client","year","medium","notes","collection","order","image_vertical"];
+    const norm = s => (s||"").trim().toLowerCase().replace(/[\s_-]+/g,"");
+    const headers = json.table.cols.map(c=>norm(c.label));
+    const colIndex = {};
+    KNOWN.forEach(name=>{
+      const idx = headers.indexOf(norm(name));
+      if(idx !== -1) colIndex[name] = idx;
+    });
     const rows = json.table.rows.map(r=>{
       const o={};
-      FIELD_NAMES.forEach((c,i)=>{ o[c] = r.c[i] ? (r.c[i].f ?? r.c[i].v ?? "") : ""; });
+      KNOWN.forEach((name,i)=>{
+        const idx = colIndex[name] !== undefined ? colIndex[name] : (Object.keys(colIndex).length===0 ? i : undefined);
+        o[name] = (idx!==undefined && r.c[idx]) ? (r.c[idx].f ?? r.c[idx].v ?? "") : "";
+      });
       return o;
     }).filter(o=>o.title && o.image);
     rows.sort((a,b)=>(Number(a.order)||9999)-(Number(b.order)||9999));
